@@ -42,11 +42,11 @@ class CdkStack(core.Stack):
             "Get Inter Document Frequency Job",
             lambda_function=self.step_lambda,
             payload=sfn.TaskInput.from_object(
-                {"action": "update_idf", "notes.$": "$.Payload"}
+                {"action": "update_idf", "notes.$": "$[*].Payload"}
             ),
         )
         map_tfidf_job = sfn.Map(
-            self, "TF*IDF Notes Map", items_path="$", max_concurrency=20
+            self, "TF*IDF Notes Map", items_path="$.Payload.notes", max_concurrency=100
         )
         get_tfidf_job = tasks.LambdaInvoke(
             self,
@@ -55,16 +55,18 @@ class CdkStack(core.Stack):
             payload=sfn.TaskInput.from_object(
                 {
                     "action": "update_tfidf_png",
-                    "id.$": "$.Payload.notes.id",
-                    "contentUpdatedAt.$": "$.Payload.notes.contentUpdatedAt",
-                    "isArchived.$": "$.Payload.notes.isArchived",
+                    "id.$": "$.id",
+                    "contentUpdatedAt.$": "$.contentUpdatedAt",
+                    "isArchived.$": "$.isArchived",
                 }
             ),
         )
 
-        definition = enumerate_job.next(
-            map_job.iterator(get_tf_job.next(get_idf_job))
-        ).next(map_tfidf_job.iterator(get_tfidf_job))
+        definition = (
+            enumerate_job.next(map_job.iterator(get_tf_job))
+            .next(get_idf_job)
+            .next(map_tfidf_job.iterator(get_tfidf_job))
+        )
         self.enumerate_statemachine = sfn.StateMachine(
             self,
             "EnumerateStateMachine",
