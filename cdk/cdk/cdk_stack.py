@@ -35,7 +35,7 @@ class CdkStack(core.Stack):
             ),
         )
         map_job = sfn.Map(
-            self, "Notes Map", items_path="$.Payload.id_list", max_concurrency=3
+            self, "Notes Map", items_path="$.Payload.id_list", max_concurrency=8
         )
         get_idf_job = tasks.LambdaInvoke(
             self,
@@ -69,7 +69,7 @@ class CdkStack(core.Stack):
             self,
             "EnumerateStateMachine",
             definition=definition,
-            timeout=core.Duration.minutes(10),
+            timeout=core.Duration.hours(5),
         )
 
     def create_update_statemachine(self):
