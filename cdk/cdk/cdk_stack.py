@@ -33,6 +33,7 @@ class CdkStack(core.Stack):
                     "isArchived.$": "$.isArchived",
                 }
             ),
+            output_path="$.Payload"
         )
         map_job = sfn.Map(
             self, "Notes Map", items_path="$.Payload.id_list", max_concurrency=8
@@ -42,7 +43,7 @@ class CdkStack(core.Stack):
             "Get Inter Document Frequency Job",
             lambda_function=self.step_lambda,
             payload=sfn.TaskInput.from_object(
-                {"action": "update_idf", "notes.$": "$[*].Payload"}
+                {"action": "update_idf", "notes.$": "$"}
             ),
         )
         map_tfidf_job = sfn.Map(
