@@ -47,7 +47,7 @@ class CdkStack(core.Stack):
             ),
         )
         map_tfidf_job = sfn.Map(
-            self, "TF*IDF Notes Map", items_path="$", max_concurrency=10
+            self, "TF*IDF Notes Map", items_path="$", max_concurrency=20
         )
         get_tfidf_job = tasks.LambdaInvoke(
             self,
