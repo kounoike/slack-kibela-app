@@ -1010,7 +1010,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "4d0a4df819e97eb9c9a58521ad073503e1feaac79a98027fef8fde1e262b6891"
+content-hash = "a4a3c18572e4425607abe43649f95fd9680245d5dddd9ef0b6b08f34eeffcc6d"
 
 [metadata.files]
 attrs = [

@@ -3,7 +3,6 @@ import aws_cdk.aws_lambda as lambda_
 from aws_cdk.aws_lambda_python import PythonFunction
 import aws_cdk.aws_logs as logs
 import aws_cdk.aws_apigateway as apigateway
-import aws_cdk.aws_secretsmanager as secretsmanager
 import aws_cdk.aws_iam as iam
 import aws_cdk.aws_ssm as ssm
 import aws_cdk.aws_s3 as s3
@@ -238,19 +237,6 @@ class CdkStack(core.Stack):
     def __init__(self, scope: core.Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        # self.secret = secretsmanager.Secret.from_secret_name_v2(self, "BoltSecret", "prod/BoltLambdaContainerTest")
-        # self.secret = secretsmanager.Secret(
-        #     self,
-        #     "AppSecret",
-        #     secret_name="SlackKibelaAppSecret",
-        #     generate_secret_string=secretsmanager.SecretStringGenerator(
-        #         generate_string_key="dummy",
-        #         secret_string_template=json.dumps({
-        #             "SLACK_SIGNING_SECRET": "****",
-        #             "SLACK_BOT_TOKEN": "xoxb-***"
-        #         }),
-        #     ),
-        # )
         self.ssm_signing_secret = ssm.StringParameter(
             self, "SLACK_SIGNING_SECRET", string_value="xxxx"
         )
