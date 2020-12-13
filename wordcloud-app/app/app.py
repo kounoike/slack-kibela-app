@@ -174,15 +174,9 @@ def update_tf(id_):
     note = result["note"]
     html = note["contentHtml"]
     text = html_text.extract_text(html)
-    logging.info("creating tokenizer")
     tokenizer = WordTokenizer("sudachi", mode="C", with_postag=True)
-    logging.info("creating tokenizer done. start tokenize")
     words = tokenizer.tokenize(text)
-    logging.info("tokenize done.")
     hiragana_re = re.compile("[\u3041-\u309F]+")
-    logging.info(
-        list(map(lambda x: (x.normalized_form, x.surface, x.postag), words[:100]))
-    )
     filtered_words = list(
         filter(
             # lambda x: len(x) > 3 or not hiragana_re.fullmatch(x),
@@ -195,7 +189,6 @@ def update_tf(id_):
     word_count = Counter(filtered_words)
     word_freq_list = list(map(lambda k: (k, word_count[k] / num_words), word_count))
     word_freq = dict(word_freq_list)
-    logging.info(word_freq)
     tf_tsv_key = get_tf_tsv_key(id_)
     tf_tsv = "\n".join(map(lambda x: "\t".join(map(str, x)), word_freq_list))
     private_bucket.put_object(Body=tf_tsv.encode("utf-8"), Key=tf_tsv_key)
@@ -226,7 +219,6 @@ def get_page_ids():
 
 
 def update_tf_s3(id_, content_updated_at):
-    logger.info(f"get_tf [{id_}] [{content_updated_at}]")
     tf_tsv_key = get_tf_tsv_key(id_)
     need_update = True
     try:
@@ -277,7 +269,6 @@ def update_idf():
                 ret["Body"].iter_lines(),
             )
         )
-        logger.info(f"[{key=}]:{words=}")
         counter.update(words)
     num_files = len(key_list)
     logger.info(f"num_files:{num_files}")
