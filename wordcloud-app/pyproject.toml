@@ -7,7 +7,6 @@ authors = ["KOUNOIKE Yuusuke <kounoike.yuusuke@gmail.com>"]
 [tool.poetry.dependencies]
 python = "^3.8"
 gql = {extras = ["requests"], version = "^2.0.0"}
-boto3 = "^1.16.30"
 html-text = "^0.5.2"
 wordcloud = "^1.8.1"
 sudachipy = { git = "https://github.com/WorksApplications/SudachiPy.git", rev = "620baaa133b85ac4a3fa547a77a31b0eb18484eb"}
@@ -15,6 +14,7 @@ konoha = "^4.6.2"
 SudachiDict-core = "^20200722"
 SudachiDict-full = "^20200722"
 joblib = "^0.17.0"
+aioboto3 = "^8.2.0"
 
 [tool.poetry.dev-dependencies]
 

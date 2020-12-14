@@ -10,9 +10,11 @@ import os
 import re
 import io
 from collections import Counter
+import asyncio
 
 import botocore
 import boto3
+import aioboto3
 from gql import Client, gql
 from gql.transport.requests import RequestsHTTPTransport
 from wordcloud import WordCloud
@@ -233,39 +235,67 @@ def delete_tf_s3(id_):
 
 
 def update_idf():
-    ret = s3_client.list_objects_v2(
-        Bucket=private_bucket_name, Prefix="tf/", MaxKeys=10
-    )
-    key_list = list(map(lambda x: x["Key"], ret["Contents"]))
-    while ret["IsTruncated"]:
-        ret = s3_client.list_objects_v2(
-            Bucket=private_bucket_name,
-            Prefix="tf/",
-            MaxKeys=1000,
-            ContinuationToken=ret["NextContinuationToken"],
-        )
-        key_list += map(lambda x: x["Key"], ret["Contents"])
-
-    def get_counter_from_s3key(key):
-        obj = private_bucket.Object(key)
-        ret = obj.get()
-        words = map(
-            lambda line: line.decode("utf-8").split("\t")[0],
-            ret["Body"].iter_lines(),
-        )
+    async def get_counter_async(obj):
+        words = []
+        ret = await obj.get()
+        async with ret["Body"] as stream:
+            while line_bytes := await stream.readline():
+                line = line_bytes.decode("utf-8")
+                word = line[:line.find("\t")]
+                words.append(word)
         return Counter(words)
 
-    num_files = len(key_list)
-    logger.info(f"num_files:{num_files}")
+    async def get_counter_main():
+        async with aioboto3.resource("s3") as s3:
+            bucket = await s3.Bucket(private_bucket_name)
+            lock = asyncio.Lock()
+            sum_counter = Counter()
+            cnt = 0
+            async for obj in bucket.objects.filter(Prefix='tf/'):
+                c = await get_counter_async(obj)
+                async with lock:
+                    sum_counter += c
+                    cnt += 1
+            return cnt, sum_counter
 
-    counter = Counter()
-    # for key in key_list:
-    #     counter += get_counter_from_s3key(key)
-    counter_list = Parallel(n_jobs=10)(
-        delayed(get_counter_from_s3key)(key) for key in key_list
-    )
-    for c in counter_list:
-        counter += c
+    num_files, counter = asyncio.run(get_counter_main())
+
+    # ret = s3_client.list_objects_v2(
+    #     Bucket=private_bucket_name, Prefix="tf/", MaxKeys=10
+    # )
+    # key_list = list(map(lambda x: x["Key"], ret["Contents"]))
+    # while ret["IsTruncated"]:
+    #     ret = s3_client.list_objects_v2(
+    #         Bucket=private_bucket_name,
+    #         Prefix="tf/",
+    #         MaxKeys=1000,
+    #         ContinuationToken=ret["NextContinuationToken"],
+    #     )
+    #     key_list += map(lambda x: x["Key"], ret["Contents"])
+
+    # async def get_counter_from_s3key(bucket, key):
+    #     async with aioboto3.resource("s3").Bucket(bucket) as aio_bucket:
+    #         obj = await aio_bucket.Object(key)
+    #         ret = obj.get()
+    #         words = map(
+    #             lambda line: line.decode("utf-8").split("\t")[0],
+    #             ret["Body"].iter_lines(),
+    #         )
+    #     return Counter(words)
+    
+    # counter_list = asyncio.gather(map(lambda key: get_counter_from_s3key(private_bucket_name, key), key_list))
+
+    # num_files = len(key_list)
+    # logger.info(f"num_files:{num_files}")
+
+    # counter = Counter()
+    # # for key in key_list:
+    # #     counter += get_counter_from_s3key(key)
+    # counter_list = Parallel(n_jobs=10)(
+    #     delayed(get_counter_from_s3key)(key) for key in key_list
+    # )
+    # for c in counter_list:
+    #     counter += c
 
     idf_tsv = "\n".join(
         map(lambda k: f"{k}\t{math.log(num_files / counter[k])}", counter)
