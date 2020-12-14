@@ -177,10 +177,11 @@ def update_tf(id_):
     tokenizer = WordTokenizer("sudachi", mode="C", with_postag=True)
     words = tokenizer.tokenize(text)
     hiragana_re = re.compile("[\u3041-\u309F]+")
+    number_re = re.compile("[0-9,.]+")
     filtered_words = list(
         filter(
             # lambda x: len(x) > 3 or not hiragana_re.fullmatch(x),
-            lambda x: len(x) > 3 if hiragana_re.fullmatch(x) else len(x) > 1,
+            lambda x: (len(x) > 3 if hiragana_re.fullmatch(x) else len(x) > 1) and not number_re.fullmatch(x),
             # map(lambda x: x.normalized_form, filter(lambda x: x.postag in ["名詞", "動詞"], words)),
             map(lambda x: x.surface, filter(lambda x: x.postag in ["名詞"], words)),
         )
