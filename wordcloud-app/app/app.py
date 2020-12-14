@@ -222,23 +222,6 @@ def get_page_ids():
         return ids_first
 
 
-def update_tf_s3(id_, content_updated_at):
-    tf_tsv_key = get_tf_tsv_key(id_)
-    need_update = True
-    try:
-        obj = private_bucket.Object(tf_tsv_key)
-        last_modified = obj.last_modified
-        update_datetime = datetime.datetime.fromisoformat(content_updated_at)
-        if update_datetime <= last_modified:
-            need_update = False
-    except Exception as e:
-        logger.info(f"update_tf[{id_}] Exception: {e}")
-    if need_update:
-        logger.info(f"update tf for {id_}")
-        update_tf(id_)
-    return
-
-
 def delete_tf_s3(id_):
     tf_tsv_key = get_tf_tsv_key(id_)
     try:
@@ -465,10 +448,7 @@ def handler(event, context):
         id_ = event["id"]
         content_updated_at = event["contentUpdatedAt"]
         is_archived = event["isArchived"]
-        if is_archived:
-            delete_tf_s3(id_)
-        else:
-            update_tf_s3(id_, content_updated_at)
+        update_tf(id_)
     elif action == "update_idf":
         update_idf()
     elif action == "update_tfidf_png":
