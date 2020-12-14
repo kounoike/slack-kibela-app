@@ -23,14 +23,14 @@ import html_text
 html_text.cleaner.kill_tags = ["code", "blockquote"]
 
 wc_config = dict(
-    font_path="/usr/share/fonts/truetype/takao-gothic/TakaoGothic.ttf",
+    font_path="/fonts/GenJyuuGothic-Normal.ttf",
     min_font_size=12,
     max_font_size=40,
     width=300,
     height=120,
     mode="RGBA",
     background_color=(0, 0, 0, 0),
-    colormap="Dark2"
+    colormap="Dark2",
 )
 
 ssm_client = boto3.client("ssm")
@@ -183,7 +183,8 @@ def update_tf(id_):
     filtered_words = list(
         filter(
             # lambda x: len(x) > 3 or not hiragana_re.fullmatch(x),
-            lambda x: (len(x) > 3 if hiragana_re.fullmatch(x) else len(x) > 1) and not number_re.fullmatch(x),
+            lambda x: (len(x) > 3 if hiragana_re.fullmatch(x) else len(x) > 1)
+            and not number_re.fullmatch(x),
             # map(lambda x: x.normalized_form, filter(lambda x: x.postag in ["名詞", "動詞"], words)),
             map(lambda x: x.surface, filter(lambda x: x.postag in ["名詞"], words)),
         )
@@ -445,6 +446,7 @@ def unfurl_from_id(id_):
         ]
     }
     return attachement
+
 
 def handler(event, context):
     logger.info(f"step_handler {event=} {context=}")

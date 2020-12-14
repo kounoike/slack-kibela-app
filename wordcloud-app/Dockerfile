@@ -14,9 +14,14 @@ RUN apt-get update && \
   cmake \
   unzip \
   libcurl4-openssl-dev \
-  fonts-takao-gothic \
-  git
+  git \
+  p7zip-full \
+  wget
 
+# Get font
+WORKDIR /fonts
+RUN wget -q https://osdn.jp/downloads/users/8/8636/genjyuugothic-20150607.7z
+RUN 7z e  genjyuugothic-20150607.7z  GenJyuuGothic-Normal.ttf
 
 # Create function directory
 RUN mkdir -p ${FUNCTION_DIR}
@@ -29,13 +34,9 @@ WORKDIR ${FUNCTION_DIR}
 RUN python -m sudachipy.command_line link -t full
 RUN echo "テスト" | python -m sudachipy.command_line -m A
 
-# Copy handler function
-COPY app/* ${FUNCTION_DIR}
-
-
 FROM python:3.8-slim-buster
 
-COPY --from=build-image /usr/share/fonts/truetype/takao-gothic/TakaoGothic.ttf /usr/share/fonts/truetype/takao-gothic/TakaoGothic.ttf
+COPY --from=build-image /fonts/GenJyuuGothic-Normal.ttf /fonts/GenJyuuGothic-Normal.ttf
 
 RUN apt-get update -q && \
     apt-get install -yqq --no-install-recommends \
@@ -52,6 +53,10 @@ WORKDIR ${FUNCTION_DIR}
 
 # Copy in the built dependencies
 COPY --from=build-image ${FUNCTION_DIR} ${FUNCTION_DIR}
+
+# Copy handler function
+COPY app/* ${FUNCTION_DIR}
+
 
 ENTRYPOINT [ "/usr/local/bin/python", "-m", "awslambdaric" ]
 CMD [ "app.handler" ]
