@@ -261,7 +261,7 @@ def update_idf():
     counter = Counter()
     # for key in key_list:
     #     counter += get_counter_from_s3key(key)
-    counter_list = Parallel(n_jobs=10, prefer="threads")(
+    counter_list = Parallel(n_jobs=10)(
         delayed(get_counter_from_s3key)(key) for key in key_list
     )
     for c in counter_list:
