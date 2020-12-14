@@ -17,6 +17,7 @@ from gql import Client, gql
 from gql.transport.requests import RequestsHTTPTransport
 from wordcloud import WordCloud
 from konoha import WordTokenizer
+from joblib import Parallel, delayed
 
 import html_text
 
@@ -243,22 +244,29 @@ def update_idf():
             MaxKeys=1000,
             ContinuationToken=ret["NextContinuationToken"],
         )
-        key_list += list(map(lambda x: x["Key"], ret["Contents"]))
+        key_list += map(lambda x: x["Key"], ret["Contents"])
 
-    counter = Counter()
-
-    for key in key_list:
+    def get_counter_from_s3key(key):
         obj = private_bucket.Object(key)
         ret = obj.get()
-        words = list(
-            map(
-                lambda line: line.decode("utf-8").split("\t")[0],
-                ret["Body"].iter_lines(),
-            )
+        words = map(
+            lambda line: line.decode("utf-8").split("\t")[0],
+            ret["Body"].iter_lines(),
         )
-        counter.update(words)
+        return Counter(words)
+
     num_files = len(key_list)
     logger.info(f"num_files:{num_files}")
+
+    counter = Counter()
+    # for key in key_list:
+    #     counter += get_counter_from_s3key(key)
+    counter_list = Parallel(n_jobs=10, prefer="threads")(
+        delayed(get_counter_from_s3key)(key) for key in key_list
+    )
+    for c in counter_list:
+        counter += c
+
     idf_tsv = "\n".join(
         map(lambda k: f"{k}\t{math.log(num_files / counter[k])}", counter)
     )

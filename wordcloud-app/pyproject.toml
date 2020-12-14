@@ -14,6 +14,7 @@ sudachipy = { git = "https://github.com/WorksApplications/SudachiPy.git", rev = 
 konoha = "^4.6.2"
 SudachiDict-core = "^20200722"
 SudachiDict-full = "^20200722"
+joblib = "^0.17.0"
 
 [tool.poetry.dev-dependencies]
 
