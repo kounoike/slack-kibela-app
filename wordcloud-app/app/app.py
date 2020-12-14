@@ -24,9 +24,9 @@ html_text.cleaner.kill_tags = ["code", "blockquote"]
 
 wc_config = dict(
     font_path="/usr/share/fonts/truetype/takao-gothic/TakaoGothic.ttf",
-    min_font_size=8,
+    min_font_size=12,
     width=300,
-    height=160,
+    height=120,
     mode="RGBA",
     background_color=(0, 0, 0, 0),
 )
