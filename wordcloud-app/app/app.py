@@ -240,7 +240,7 @@ def update_idf():
         ret = s3_client.list_objects_v2(
             Bucket=private_bucket_name,
             Prefix="tf/",
-            MaxKeys=10,
+            MaxKeys=1000,
             ContinuationToken=ret["NextContinuationToken"],
         )
         key_list += list(map(lambda x: x["Key"], ret["Contents"]))
