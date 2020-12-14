@@ -20,7 +20,7 @@ from konoha import WordTokenizer
 
 import html_text
 
-html_text.cleaner.kill_tags = ["code"]
+html_text.cleaner.kill_tags = ["code", "blockquote"]
 
 wc_config = dict(
     font_path="/usr/share/fonts/truetype/takao-gothic/TakaoGothic.ttf",
