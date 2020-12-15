@@ -287,7 +287,7 @@ def update_idf():
     #     counter += c
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=num_parallel) as executor:
-        future_to_counter = {executor.submit(get_counter_from_s3key_list, keys, 120): keys for keys in key_list_list}
+        future_to_counter = {executor.submit(get_counter_from_s3key_list, keys): keys for keys in key_list_list}
         for future in concurrent.futures.as_completed(future_to_counter):
             keys = future_to_counter[future]
             try:
@@ -295,6 +295,7 @@ def update_idf():
             except Exception as exc:
                 logger.error(f'{keys} generated an exception: {exc}')
             else:
+                logger.info(f"counter: {c}")
                 counter += c
 
     idf_tsv = "\n".join(
