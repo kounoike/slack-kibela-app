@@ -10,6 +10,8 @@ import os
 import re
 import io
 from collections import Counter
+import time
+import concurrent
 
 import botocore
 import boto3
@@ -17,7 +19,6 @@ from gql import Client, gql
 from gql.transport.requests import RequestsHTTPTransport
 from wordcloud import WordCloud
 from konoha import WordTokenizer
-from joblib import Parallel, delayed
 
 import html_text
 
@@ -255,17 +256,46 @@ def update_idf():
         )
         return Counter(words)
 
+    def get_counter_from_s3key_list(keylist):
+        counter = Counter()
+        for key in keylist:
+            obj = private_bucket.Object(key)
+            ret = obj.get()
+            words = map(
+                lambda line: line.decode("utf-8").split("\t")[0],
+                ret["Body"].iter_lines(),
+            )
+            counter.update(words)
+        return counter
+
+
     num_files = len(key_list)
     logger.info(f"num_files:{num_files}")
 
     counter = Counter()
     # for key in key_list:
     #     counter += get_counter_from_s3key(key)
-    counter_list = Parallel(n_jobs=10)(
-        delayed(get_counter_from_s3key)(key) for key in key_list
-    )
-    for c in counter_list:
-        counter += c
+    # counter_list = Parallel(n_jobs=10)(
+    #     delayed(get_counter_from_s3key)(key) for key in key_list
+    # )
+    num_parallel = 20
+    key_list_list = [key_list[i::num_parallel] for i in range(num_parallel)]
+
+    # with multiprocessing.Pool(num_parallel) as pool:
+    #     counter_list = pool.map(get_counter_from_s3key_list, key_list_list)
+    # for c in counter_list:
+    #     counter += c
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=num_parallel) as executor:
+        future_to_counter = {executor.submit(get_counter_from_s3key_list, keys, 120): keys for keys in key_list_list}
+        for future in concurrent.futures.as_completed(future_to_counter):
+            keys = future_to_counter[future]
+            try:
+                c = future.result()
+            except Exception as exc:
+                logger.error(f'{keys} generated an exception: {exc}')
+            else:
+                counter += c
 
     idf_tsv = "\n".join(
         map(lambda k: f"{k}\t{math.log(num_files / counter[k])}", counter)
