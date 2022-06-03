@@ -9,7 +9,7 @@ python = "^3.8"
 boto3 = "^1.16.30"
 slack-bolt = "^1.1.1"
 aws-lambda-wsgi = "^0.0.6"
-bottle = "^0.12.19"
+bottle = "^0.12.20"
 
 [tool.poetry.dev-dependencies]
 
