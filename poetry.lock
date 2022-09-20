@@ -15,7 +15,7 @@ optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [package.extras]
-dev = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>=4.3.0)", "six", "zope.interface", "furo", "sphinx", "pre-commit"]
+dev = ["coverage[toml] (>=5.0.2)", "furo", "hypothesis", "pre-commit", "pympler", "pytest (>=4.3.0)", "six", "sphinx", "zope.interface"]
 docs = ["furo", "sphinx", "zope.interface"]
 tests = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>=4.3.0)", "six", "zope.interface"]
 tests_no_zope = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>=4.3.0)", "six"]
@@ -580,7 +580,7 @@ python-versions = "~=3.7"
 attrs = ">=20.1.0"
 
 [package.extras]
-dev = ["bumpversion", "wheel", "watchdog", "flake8", "tox", "coverage", "sphinx", "pytest", "hypothesis", "pendulum", "isort", "black"]
+dev = ["Sphinx", "black", "bumpversion", "coverage", "flake8", "hypothesis", "isort", "pendulum", "pytest", "tox", "watchdog", "wheel"]
 
 [[package]]
 name = "click"
@@ -698,9 +698,9 @@ python-versions = ">=3.6"
 slack-sdk = ">=3.1.0,<3.2"
 
 [package.extras]
-adapter = ["boto3 (<=2)", "moto (<=2)", "bottle (>=0.12,<1)", "boddle (>=0.2,<0.3)", "chalice (>=1,<2)", "click (>=7,<8)", "CherryPy (>=18,<19)", "Django (>=3,<4)", "falcon (>=2,<3)", "fastapi (<1)", "Flask (>=1,<2)", "pyramid (>=1,<2)", "sanic (>=20,<21)", "starlette (>=0.13,<1)", "requests (>=2,<3)", "tornado (>=6,<7)", "uvicorn (<1)", "gunicorn (>=20,<21)"]
+adapter = ["CherryPy (>=18,<19)", "Django (>=3,<4)", "Flask (>=1,<2)", "boddle (>=0.2,<0.3)", "boto3 (<=2)", "bottle (>=0.12,<1)", "chalice (>=1,<2)", "click (>=7,<8)", "falcon (>=2,<3)", "fastapi (<1)", "gunicorn (>=20,<21)", "moto (<=2)", "pyramid (>=1,<2)", "requests (>=2,<3)", "sanic (>=20,<21)", "starlette (>=0.13,<1)", "tornado (>=6,<7)", "uvicorn (<1)"]
 async = ["aiohttp (>=3,<4)"]
-testing = ["pytest (>=5,<6)", "pytest-cov (>=2,<3)", "pytest-asyncio (<1)", "aiohttp (>=3,<4)", "black (==19.10b0)"]
+testing = ["aiohttp (>=3,<4)", "black (==19.10b0)", "pytest (>=5,<6)", "pytest-asyncio (<1)", "pytest-cov (>=2,<3)"]
 
 [[package]]
 name = "slack-sdk"
@@ -711,8 +711,8 @@ optional = false
 python-versions = ">=3.6.0"
 
 [package.extras]
-optional = ["aiodns (>1.0)", "aiohttp (>=3,<4)", "boto3 (<=2)", "SQLAlchemy (>=1,<2)"]
-testing = ["pytest (>=5.4,<6)", "pytest-asyncio (<1)", "pytest-cov (>=2,<3)", "codecov (>=2,<3)", "flake8 (>=3,<4)", "black (==19.10b0)", "psutil (>=5,<6)", "databases (>=0.3)"]
+optional = ["SQLAlchemy (>=1,<2)", "aiodns (>1.0)", "aiohttp (>=3,<4)", "boto3 (<=2)"]
+testing = ["black (==19.10b0)", "codecov (>=2,<3)", "databases (>=0.3)", "flake8 (>=3,<4)", "psutil (>=5,<6)", "pytest (>=5.4,<6)", "pytest-asyncio (<1)", "pytest-cov (>=2,<3)"]
 
 [[package]]
 name = "toml"
@@ -740,7 +740,7 @@ python-versions = "*"
 
 [[package]]
 name = "urllib3"
-version = "1.26.2"
+version = "1.26.5"
 description = "HTTP library with thread-safe connection pooling, file post, and more."
 category = "main"
 optional = false
@@ -748,7 +748,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, <4"
 
 [package.extras]
 brotli = ["brotlipy (>=0.6.0)"]
-secure = ["pyOpenSSL (>=0.14)", "cryptography (>=1.3.4)", "idna (>=2.0.0)", "certifi", "ipaddress"]
+secure = ["certifi", "cryptography (>=1.3.4)", "idna (>=2.0.0)", "ipaddress", "pyOpenSSL (>=0.14)"]
 socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 
 [metadata]
@@ -1029,6 +1029,6 @@ typing-extensions = [
     {file = "typing_extensions-3.7.4.3.tar.gz", hash = "sha256:99d4073b617d30288f569d3f13d2bd7548c3a7e4c8de87db09a9d29bb3a4a60c"},
 ]
 urllib3 = [
-    {file = "urllib3-1.26.2-py2.py3-none-any.whl", hash = "sha256:d8ff90d979214d7b4f8ce956e80f4028fc6860e4431f731ea4a8c08f23f99473"},
-    {file = "urllib3-1.26.2.tar.gz", hash = "sha256:19188f96923873c92ccb987120ec4acaa12f0461fa9ce5d3d0772bc965a39e08"},
+    {file = "urllib3-1.26.5-py2.py3-none-any.whl", hash = "sha256:753a0374df26658f99d826cfe40394a686d05985786d946fbe4165b5148f5a7c"},
+    {file = "urllib3-1.26.5.tar.gz", hash = "sha256:a7acd0977125325f516bda9735fa7142b909a8d01e8b2e4c8108d0984e6e0098"},
 ]
